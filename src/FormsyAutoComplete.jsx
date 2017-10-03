@@ -75,7 +75,7 @@ const FormsyAutoComplete = createClass({
         onFocus={onFocus}
         onKeyDown={this.handleKeyDown}
         ref={this.setMuiComponentAndMaybeFocus}
-        value={this.state.value}
+        searchText={this.state.value}
       />
     );
   },
