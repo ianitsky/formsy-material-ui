@@ -1,32 +1,38 @@
 import React from 'react';
-import createClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import keycode from 'keycode';
-import Formsy from 'formsy-react';
+import {withFormsy} from 'formsy-react';
 import TextField from 'material-ui/TextField';
 import { setMuiComponentAndMaybeFocus, debounce } from './utils';
 
-const FormsyText = createClass({
+class FormsyText extends React.Component {
+  constructor(props) {
+    super(props)
+    this.propTypes = {
+      convertValue: PropTypes.func,
+      defaultValue: PropTypes.any,
+      name: PropTypes.string.isRequired,
+      onBlur: PropTypes.func,
+      onChange: PropTypes.func,
+      onKeyDown: PropTypes.func,
+      requiredError: PropTypes.string,
+      underlineFocusStyle: PropTypes.object,
+      underlineStyle: PropTypes.object,
+      updateImmediately: PropTypes.bool,
+      validationColor: PropTypes.string,
+      validationError: PropTypes.string,
+      validationErrors: PropTypes.object,
+      validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+      value: PropTypes.any,
+    }
 
-  propTypes: {
-    convertValue: PropTypes.func,
-    defaultValue: PropTypes.any,
-    name: PropTypes.string.isRequired,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
-    onKeyDown: PropTypes.func,
-    requiredError: PropTypes.string,
-    underlineFocusStyle: PropTypes.object,
-    underlineStyle: PropTypes.object,
-    updateImmediately: PropTypes.bool,
-    validationColor: PropTypes.string,
-    validationError: PropTypes.string,
-    validationErrors: PropTypes.object,
-    validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    value: PropTypes.any,
-  },
+    this.setMuiComponentAndMaybeFocus = setMuiComponentAndMaybeFocus
 
-  mixins: [Formsy.Mixin],
+    const value = this.props.controlledValue();
+    this.state = {
+      value
+    }
+  }
 
   getDefaultProps() {
     return {
@@ -34,16 +40,11 @@ const FormsyText = createClass({
       underlineStyle: {},
       validationColor: '#4CAF50',
     };
-  },
-
-  getInitialState() {
-    const value = this.controlledValue();
-    return { value };
-  },
+  }
 
   componentWillMount() {
     this.setValue(this.controlledValue());
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     const isValueChanging = nextProps.value !== this.props.value;
@@ -56,7 +57,7 @@ const FormsyText = createClass({
         if (this.getValue() !== value) this.setValue(value);
       }
     }
-  },
+  }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextState._isPristine && // eslint-disable-line no-underscore-dangle
@@ -67,17 +68,17 @@ const FormsyText = createClass({
       this.setValue(value);
       this.setState({ value, isValid });
     }
-  },
+  }
 
   controlledValue(props = this.props) {
     return props.value || props.defaultValue || this.convertValue('');
-  },
+  }
 
   handleBlur(event) {
     this.setValue(this.convertValue(event.currentTarget.value));
     delete this.changeValue;
     if (this.props.onBlur) this.props.onBlur(event);
-  },
+  }
 
   handleChange(event) {
     // Update the value (and so display any error) after a timeout.
@@ -102,12 +103,12 @@ const FormsyText = createClass({
     // Controlled component
     this.setState({ value: event.currentTarget.value, isValid: this.isValidValue(event.currentTarget.value) });
     if (this.props.onChange) this.props.onChange(event, event.currentTarget.value);
-  },
+  }
 
   handleKeyDown(event) {
     if (keycode(event) === 'enter') this.setValue(this.convertValue(event.currentTarget.value));
     if (this.props.onKeyDown) this.props.onKeyDown(event, event.currentTarget.value);
-  },
+  }
 
   convertValue(value) {
     if (this.props.convertValue) {
@@ -115,9 +116,7 @@ const FormsyText = createClass({
     } else {
       return value;
     }
-  },
-
-  setMuiComponentAndMaybeFocus: setMuiComponentAndMaybeFocus,
+  }
 
   render() {
     const {
@@ -136,11 +135,11 @@ const FormsyText = createClass({
 
     const { isRequired, isPristine, isValid, isFormSubmitted } = this;
     const isRequiredError = isRequired() && !isPristine() && !isValid() && isFormSubmitted() && requiredError;
-    const errorText = this.getErrorMessage() || isRequiredError;
+    const errorText = this.props.getErrorMessage() || isRequiredError;
 
     return (
       <TextField
-        disabled={this.isFormDisabled()}
+        disabled={this.props.isFormDisabled()}
         {...rest}
         errorText={errorText}
         onBlur={this.handleBlur}
@@ -152,7 +151,7 @@ const FormsyText = createClass({
         underlineFocusStyle={this.state.isValid ? { borderColor: validationColor } : underlineFocusStyle}
       />
     );
-  },
-});
+  }
+}
 
-export default FormsyText;
+export default withFormsy(FormsyText);
