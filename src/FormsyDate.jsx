@@ -56,7 +56,7 @@ class FormsyDate extends React.Component {
       validationErrors, // eslint-disable-line no-unused-vars
       validationError, // eslint-disable-line no-unused-vars
       requiredError,
-      isFormSubmitted
+      isFormSubmitted,
       isPristine,
       isRequired,
       isValid,

@@ -4,7 +4,7 @@ import { withFormsy } from 'formsy-react'
 import { RadioButtonGroup, RadioButton } from 'material-ui/RadioButton'
 import { setMuiComponentAndMaybeFocus } from './utils'
 
-const FormsyRadioGroup = createClass({
+class FormsyRadioGroup extends React.Component {
   constructor(props) {
     super(props)
 
