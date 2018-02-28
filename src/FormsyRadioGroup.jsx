@@ -1,35 +1,25 @@
-import React from 'react';
-import createClass from 'create-react-class';
-import PropTypes from 'prop-types';
-import Formsy from 'formsy-react';
-import { RadioButtonGroup, RadioButton } from 'material-ui/RadioButton';
-import { setMuiComponentAndMaybeFocus } from './utils';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { withFormsy } from 'formsy-react'
+import { RadioButtonGroup, RadioButton } from 'material-ui/RadioButton'
+import { setMuiComponentAndMaybeFocus } from './utils'
 
 const FormsyRadioGroup = createClass({
+  constructor(props) {
+    super(props)
 
-  propTypes: {
-    children: PropTypes.node,
-    defaultSelected: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
-    name: PropTypes.string.isRequired,
-    onChange: PropTypes.func,
-    validationError: PropTypes.string,
-    validationErrors: PropTypes.object,
-    validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
-  },
-
-  mixins: [Formsy.Mixin],
+    this.handleValueChange = this.handleValueChange.bind(this)
+    this.setMuiComponentAndMaybeFocus = setMuiComponentAndMaybeFocus.bind(this)
+  }
 
   componentDidMount() {
-    this.setValue(this.muiComponent.getSelectedValue());
-  },
+    this.props.setValue(this.muiComponent.getSelectedValue());
+  }
 
   handleValueChange(event, value) {
     this.setValue(value);
     if (this.props.onChange) this.props.onChange(event, value);
-  },
-
-  setMuiComponentAndMaybeFocus: setMuiComponentAndMaybeFocus,
+  }
 
   render() {
     let {
@@ -61,17 +51,28 @@ const FormsyRadioGroup = createClass({
 
     return (
       <RadioButtonGroup
-        disabled={this.isFormDisabled()}
+        disabled={this.props.isFormDisabled()}
         {...rest}
         ref={this.setMuiComponentAndMaybeFocus}
         onChange={this.handleValueChange}
-        valueSelected={this.getValue()}
+        valueSelected={this.props.getValue()}
         defaultSelected={value}
       >
         {children}
       </RadioButtonGroup>
     );
-  },
-});
+  }
+}
 
-export default FormsyRadioGroup;
+FormsyRadioGroup.propTypes = {
+  children: PropTypes.node,
+  defaultSelected: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func,
+  validationError: PropTypes.string,
+  validationErrors: PropTypes.object,
+  validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
+}
+
+export default withFormsy(FormsyRadioGroup)

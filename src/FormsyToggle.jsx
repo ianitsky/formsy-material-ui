@@ -1,33 +1,25 @@
-import React from 'react';
-import createClass from 'create-react-class';
-import PropTypes from 'prop-types';
-import Formsy from 'formsy-react';
-import Toggle from 'material-ui/Toggle';
-import { setMuiComponentAndMaybeFocus } from './utils';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { withFormsy } from 'formsy-react'
+import Toggle from 'material-ui/Toggle'
+import { setMuiComponentAndMaybeFocus } from './utils'
 
-const FormsyToggle = createClass({
+class FormsyToggle extends React.Component {
+  constructor(props) {
+    super(props)
 
-  propTypes: {
-    defaultToggled: PropTypes.bool,
-    name: PropTypes.string.isRequired,
-    onChange: PropTypes.func,
-    validationError: PropTypes.string,
-    validationErrors: PropTypes.object,
-    validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  },
-
-  mixins: [Formsy.Mixin],
+    this.handleChange = this.handleChange.bind(this)
+    this.setMuiComponentAndMaybeFocus = setMuiComponentAndMaybeFocus.bind(this)
+  }
 
   componentDidMount() {
-    this.setValue(this.muiComponent.isToggled());
-  },
+    this.props.setValue(this.muiComponent.isToggled());
+  }
 
   handleChange(event, value) {
-    this.setValue(value);
+    this.props.setValue(value);
     if (this.props.onChange) this.props.onChange(event, value);
-  },
-
-  setMuiComponentAndMaybeFocus: setMuiComponentAndMaybeFocus,
+  }
 
   render() {
     const {
@@ -37,7 +29,7 @@ const FormsyToggle = createClass({
       validationErrors, // eslint-disable-line no-unused-vars
       ...rest } = this.props;
 
-    let value = this.getValue();
+    let value = this.props.getValue();
 
     if (typeof value === 'undefined') {
       value = (typeof defaultToggled !== 'undefined') ? defaultToggled : false;
@@ -45,14 +37,23 @@ const FormsyToggle = createClass({
 
     return (
       <Toggle
-        disabled={this.isFormDisabled()}
+        disabled={this.props.isFormDisabled()}
         {...rest}
         onToggle={this.handleChange}
         ref={this.setMuiComponentAndMaybeFocus}
         toggled={value}
       />
     );
-  },
-});
+  }
+}
 
-export default FormsyToggle;
+FormsyToggle.propTypes = {
+  defaultToggled: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func,
+  validationError: PropTypes.string,
+  validationErrors: PropTypes.object,
+  validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+}
+
+export default withFormsy(FormsyToggle)

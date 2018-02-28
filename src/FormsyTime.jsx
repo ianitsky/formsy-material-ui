@@ -1,41 +1,34 @@
-import React from 'react';
-import createClass from 'create-react-class';
-import PropTypes from 'prop-types';
-import Formsy from 'formsy-react';
-import TimePicker from 'material-ui/TimePicker';
-import { setMuiComponentAndMaybeFocus } from './utils';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { withFormsy } from 'formsy-react'
+import TimePicker from 'material-ui/TimePicker'
+import { setMuiComponentAndMaybeFocus } from './utils'
 
-const FormsyTime = createClass({
+class FormsyTime extends React.Component {
+  constructor(props) {
+    super(props)
 
-  propTypes: {
-    defaultTime: PropTypes.object,
-    name: PropTypes.string.isRequired,
-    onChange: PropTypes.func,
-    validationError: PropTypes.string,
-    validationErrors: PropTypes.object,
-    validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    value: PropTypes.object,
-  },
-
-  mixins: [Formsy.Mixin],
+    this.handleChange = this.handleChange.bind(this)
+    this.setMuiComponentAndMaybeFocus = setMuiComponentAndMaybeFocus.bind(this)
+  }
 
   componentDidMount() {
     const { defaultTime } = this.props;
-    const value = this.getValue();
+    const value = this.props.getValue();
 
     if (typeof value === 'undefined' && typeof defaultTime !== 'undefined') {
-      this.setValue(defaultTime);
+      this.props.setValue(defaultTime);
     }
-  },
+  }
 
   componentWillReceiveProps(newProps) {
     if (newProps.value) {
       if (!this.props.value || !timesEq(this.props.value, newProps.value)) {
-        this.setValue(newProps.value);
+        this.props.setValue(newProps.value);
       }
     } else if (!this.props.value && newProps.defaultTime) {
       if (!timesEq(this.props.defaultTime, newProps.defaultTime)) {
-        this.setValue(newProps.defaultTime);
+        this.props.setValue(newProps.defaultTime);
       }
     }
 
@@ -48,14 +41,12 @@ const FormsyTime = createClass({
       return date1.getHours() === date2.getHours() &&
         date1.getMinutes() === date2.getMinutes();
     }
-  },
+  }
 
   handleChange(event, value) {
-    this.setValue(value);
+    this.props.setValue(value);
     if (this.props.onChange) this.props.onChange(event, value);
-  },
-
-  setMuiComponentAndMaybeFocus: setMuiComponentAndMaybeFocus,
+  }
 
   render() {
     const {
@@ -68,15 +59,25 @@ const FormsyTime = createClass({
 
     return (
       <TimePicker
-        disabled={this.isFormDisabled()}
+        disabled={this.props.isFormDisabled()}
         {...rest}
-        errorText={this.getErrorMessage()}
+        errorText={this.props.getErrorMessage()}
         onChange={this.handleChange}
         ref={this.setMuiComponentAndMaybeFocus}
-        value={this.getValue()}
+        value={this.props.getValue()}
       />
     );
-  },
-});
+  }
+}
 
-export default FormsyTime;
+FormsyTime.propTypes = {
+  defaultTime: PropTypes.object,
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func,
+  validationError: PropTypes.string,
+  validationErrors: PropTypes.object,
+  validations: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  value: PropTypes.object,
+}
+
+export default withFormsy(FormsyTime)
